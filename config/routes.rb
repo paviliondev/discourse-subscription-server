@@ -1,5 +1,5 @@
 SubscriptionServer::Engine.routes.draw do
-  get '/user-subscriptions/:client_name' => 'user_subscriptions#index'
+  get '/user-subscriptions/:subscription_type/:client_name' => 'user_subscriptions#index'
 end
 
 Discourse::Application.routes.append do

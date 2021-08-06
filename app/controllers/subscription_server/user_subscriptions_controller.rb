@@ -20,6 +20,6 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
   end
 
   def user_subscription_params
-    params.permit(:client_name, :subscription_type)
+    params.permit(:subscription_type, :client_name)
   end
 end
