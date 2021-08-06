@@ -1,6 +1,6 @@
 class SubscriptionServer::UserSubscriptionsController < ApplicationController
   skip_before_action :check_xhr, :preload_json, :verify_authenticity_token
-  before_action :ensure_user_api_request
+  before_action :ensure_can_access
 
   def index
     user_subscriptions = SubscriptionServer::UserSubscriptions.new(current_user)
@@ -15,8 +15,10 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
 
   protected
 
-  def ensure_user_api_request
-    raise Discourse::InvalidAccess.new('only available via user api') if !is_user_api?
+  def ensure_can_access
+    unless is_user_api? && current_user.present?
+      raise Discourse::InvalidAccess.new('only available via user api')
+    end
   end
 
   def user_subscription_params
