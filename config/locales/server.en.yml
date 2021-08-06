@@ -5,4 +5,4 @@ en:
   
   user_api_key:
     scopes:
-      discourse-subscription-server:user_subscription: User subscription
+      discourse-subscription-server:user_subscription: Subscriptions

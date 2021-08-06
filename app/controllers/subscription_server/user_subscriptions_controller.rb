@@ -1,5 +1,5 @@
 class SubscriptionServer::UserSubscriptionsController < ApplicationController
-  skip_before_action :check_xhr
+  skip_before_action :check_xhr, :preload_json, :verify_authenticity_token
   before_action :ensure_user_api_request
 
   def index
