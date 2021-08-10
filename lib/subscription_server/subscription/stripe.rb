@@ -12,7 +12,10 @@ module SubscriptionServer::Stripe
 
   def stripe_load(product_id)
     subscriptions = stripe_subscriptions
-    return false unless subscriptions.any?
+    unless subscriptions.any?
+      Rails.logger.warn("Subscription Server Log: no subscriptions found for user #{@user.username}")
+      return false
+    end
 
     @subscriptions = subscriptions.reduce([]) do |result, subscription|
       subscripion = subscripion.to_h
@@ -38,10 +41,6 @@ module SubscriptionServer::Stripe
 
   def stripe_customers
     ::Stripe::Customer.list(email: @user.email, expand: ['data.subscriptions'])
-  end
-
-  def stripe_subscription_price_keys
-    
   end
 
   def stripe_retrieve_api_key

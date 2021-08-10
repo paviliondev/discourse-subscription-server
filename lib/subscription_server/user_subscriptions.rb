@@ -25,7 +25,10 @@ class SubscriptionServer::UserSubscriptions
       self.send(initialize_method)
 
     product_id = client_products[@client.to_sym]
-    return false unless product_id
+    unless product_id
+      Rails.logger.warn("Subscription Server Log: no client found for user #{@user.username} with #{opts.to_s}")
+      return false
+    end
 
     self.send(load_method, product_id)
   end
