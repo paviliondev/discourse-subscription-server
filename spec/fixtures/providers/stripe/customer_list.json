@@ -1,0 +1,36 @@
+{
+  "object": "list",
+  "url": "/v1/customers",
+  "has_more": false,
+  "data": [
+    {
+      "id": "cus_91fz3aebyTniMk",
+      "object": "customer",
+      "address": null,
+      "balance": 0,
+      "created": 1471473359,
+      "currency": "usd",
+      "default_source": "card_18jcdF2eZvKYlo2CymmFeZo5",
+      "delinquent": true,
+      "description": "Ava Taylor",
+      "discount": null,
+      "email": "",
+      "invoice_prefix": "80B2DEF",
+      "invoice_settings": {
+        "custom_fields": null,
+        "default_payment_method": null,
+        "footer": null
+      },
+      "livemode": false,
+      "metadata": {
+        "order_id": "6735"
+      },
+      "name": null,
+      "next_invoice_sequence": 49784,
+      "phone": null,
+      "preferred_locales": [],
+      "shipping": null,
+      "tax_exempt": "none"
+    }
+  ]
+}

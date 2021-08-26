@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ::SubscriptionServer
   PLUGIN_NAME ||= 'subscription_server'
 

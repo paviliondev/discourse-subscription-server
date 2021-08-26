@@ -1,56 +1,54 @@
-SubscriptionInfo = Struct.new(:product_id, :price_id, :price_nickname, keyword_init: true)
+# frozen_string_literal: true
 
 class SubscriptionServer::UserSubscriptions
-  include SubscriptionServer::Stripe
-
   attr_reader :user
-  attr_accessor :subscriptions
+  attr_accessor :subscriptions,
+                :error
 
   def initialize(user)
     @user = user
     @subscriptions = []
+    @error = nil
+  end
+
+  def self.providers
+    {
+      stripe: "SubscriptionServer::Stripe"
+    }
   end
 
   def load(opts)
-    @type = opts[:subscription_type]
-    @client = opts[:client_name]
+    klass = self.class.providers[opts[:provider].to_sym]
+    return handle_failure("#{opts[:provider]} is not a supported provider") unless klass
 
-    load_method = "#{@type}_load"
-    installed_method = "#{@type}_installed"
-    initialize_method = "#{@type}_initialize"
+    provider = klass.constantize.new(@user)
+    return handle_failure("#{opts[:provider]} is not installed") unless provider.installed
+    return handle_failure("failed to setup #{opts[:provider]}") unless provider.setup
 
-    return false unless self.respond_to?(load_method) &&
-      self.respond_to?(installed_method) &&
-      self.send(installed_method) &&
-      self.send(initialize_method)
+    provider_id = clients[opts[:client_name].to_sym]
+    return handle_failure("no provider id found for #{opts[:client_name]}") unless provider_id
 
-    product_id = client_products[@client.to_sym]
-    unless product_id
-      Rails.logger.warn("Subscription Server Log: no client found for user #{@user.username} with #{opts.to_s}")
-      return false
-    end
+    subscriptions = provider.load(provider_id)
+    return handle_failure("no subscriptions found") unless subscriptions.any?
 
-    self.send(load_method, product_id)
-  end
-
-  def any?
-    @subscriptions.any?
-  end
-
-  def info
-    @subscriptions.map do |subscription|
-      self.send("#{@type}_subscription_info", subscription).to_h
-    end
+    @subscriptions = subscriptions
   end
 
   protected
 
-  def client_products
-    @client_products ||= SiteSetting.subscription_server_client_products.split('|')
+  def clients
+    @clients ||= SiteSetting.subscription_server_clients.split('|')
       .reduce({}) do |result, item|
         parts = item.split(':')
         result[parts.first.to_sym] = parts.second
         result
       end
+  end
+
+  def handle_failure(message)
+    full_message = "Failed to load subscriptions for #{@user.username}: #{message}"
+    Rails.logger.warn(full_message)
+    @error = full_message
+    false
   end
 end

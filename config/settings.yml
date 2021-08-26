@@ -1,6 +1,6 @@
 plugins:
   subscription_server_enabled: true
-  subscription_server_client_products:
+  subscription_server_clients:
     type: list
     default: ''
   
