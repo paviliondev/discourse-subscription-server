@@ -26,7 +26,7 @@ class SubscriptionServer::UserSubscriptions
     return handle_failure("failed to setup #{opts[:provider]}") unless provider.setup
 
     provider_id = clients[opts[:client_name].to_sym]
-    return handle_failure("no provider id found for #{opts[:client_name]}") unless provider_id
+    return handle_failure("no provider found for #{opts[:client_name]}") unless provider_id
 
     subscriptions = provider.load(provider_id)
     return handle_failure("no subscriptions found") unless subscriptions.any?
@@ -37,7 +37,7 @@ class SubscriptionServer::UserSubscriptions
   protected
 
   def clients
-    @clients ||= SiteSetting.subscription_server_clients.split('|')
+    @clients ||= SiteSetting.subscription_server_client_providers.split('|')
       .reduce({}) do |result, item|
         parts = item.split(':')
         result[parts.first.to_sym] = parts.second

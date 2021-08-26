@@ -18,7 +18,7 @@ module ::Stripe
 
     def self.list(email: nil, expand: nil)
       stripe_path = "#{Rails.root}/plugins/discourse-subscription-server/spec/fixtures/providers/stripe"
-      customer_list = JSON.parse(File.open("#{stripe_path}/customer_list.json"))
+      customer_list = JSON.parse(::File.open("#{stripe_path}/customer_list.json"))
       customer_list["data"][0]["email"] = email
 
       if expand.first == 'data.subscriptions'
@@ -26,7 +26,7 @@ module ::Stripe
         customer_list["data"][0]["subscriptions"]["data"] ||= []
 
         if has_subscription
-          subscription = JSON.parse(File.open("#{stripe_path}/subscription.json"))
+          subscription = JSON.parse(::File.open("#{stripe_path}/subscription.json"))
           subscription["items"]["data"][0]["price"]["product"] = PRODUCT_ID
           subscription["items"]["data"][0]["price"]["id"] = PRICE_ID
           subscription["items"]["data"][0]["price"]["nickname"] = PRICE_NICKNAME

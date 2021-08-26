@@ -10,9 +10,11 @@ class SubscriptionServer::Stripe < SubscriptionServer::Provider
   end
 
   def setup
-    if SiteSetting.respond_to?("discourse_subscriptions_secret_key")
+    if SiteSetting.respond_to?("discourse_subscriptions_secret_key") &&
+        SiteSetting.discourse_subscriptions_secret_key.present?
       ::Stripe.api_key = SiteSetting.discourse_subscriptions_secret_key
     end
+
     ::Stripe.api_key.present?
   end
 
@@ -21,17 +23,17 @@ class SubscriptionServer::Stripe < SubscriptionServer::Provider
     subscriptions = customers[:data].map { |c| c[:subscriptions][:data] }.flatten(1)
     return [] unless subscriptions.any?
 
-    subscriptions.reduce([]) do |result, subscription|
-      subscripion = subscripion.to_h
-      price = subscription[:items][:data][0][:price]
+    subscriptions.reduce([]) do |result, sub|
+      sub_hash = sub.to_h
+      price = sub_hash[:items][:data][0][:price]
 
       if price[:product] == provider_id
-        SubscriptionServer::Subscription.new(
+        subscription = SubscriptionServer::Subscription.new(
           product_id: price[:product],
           price_id: price[:id],
           price_nickname: price[:nickname]
         )
-        result.push(subscripion)
+        result.push(subscription)
       end
 
       result

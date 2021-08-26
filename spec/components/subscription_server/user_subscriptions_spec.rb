@@ -46,12 +46,12 @@ describe SubscriptionServer::UserSubscriptions do
 
         it "requires a valid client" do
           @instance.load(provider: provider, client_name: client_name)
-          expect(@instance.error).to eq(response_error("no provider id found for #{client_name}"))
+          expect(@instance.error).to eq(response_error("no provider found for #{client_name}"))
         end
 
         context "with a valid client" do
           before do
-            SiteSetting.subscription_server_clients = "custom_wizard:#{Stripe::PRODUCT_ID}"
+            SiteSetting.subscription_server_client_providers = "custom_wizard:#{Stripe::PRODUCT_ID}"
           end
 
           it "returns an error if no subscriptions" do
@@ -65,6 +65,7 @@ describe SubscriptionServer::UserSubscriptions do
             @instance.load(provider: provider, client_name: client_name)
             expect(@instance.error).to eq(nil)
             expect(@instance.subscriptions.size).to eq(1)
+            expect(@instance.subscriptions.first.product_id).to eq(Stripe::PRODUCT_ID)
           end
         end
       end
