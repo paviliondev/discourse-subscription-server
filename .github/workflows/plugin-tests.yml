@@ -26,7 +26,7 @@ jobs:
       fail-fast: false
 
       matrix:
-        build_type: ["backend", "frontend"]
+        build_type: ["backend"]
         ruby: ["2.7"]
         postgres: ["12"]
         redis: ["4.x"]
