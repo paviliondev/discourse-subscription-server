@@ -21,7 +21,7 @@ after_initialize do
     load File.expand_path(path, __FILE__)
   end
 
-  add_user_api_key_scope(:'user-subscription',
+  add_user_api_key_scope(:user_subscription,
     methods: :get,
     actions: "subscription_server/user_subscriptions#index",
     params: :client_name
