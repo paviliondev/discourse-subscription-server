@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require_relative '../../plugin_helper'
-require 'byebug'
 
 describe SubscriptionServer::UserSubscriptionsController do
   let(:user) { Fabricate(:user) }

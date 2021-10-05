@@ -13,10 +13,13 @@ after_initialize do
     ../lib/subscription_server/engine.rb
     ../lib/subscription_server/subscription.rb
     ../lib/subscription_server/provider.rb
+    ../lib/subscription_server/message.rb
     ../lib/subscription_server/providers/stripe.rb
     ../lib/subscription_server/user_subscriptions.rb
     ../config/routes.rb
     ../app/controllers/subscription_server/user_subscriptions_controller.rb
+    ../app/controllers/subscription_server/messages_controller.rb
+    ../app/serializers/subscription_server/message_serializer.rb
   ].each do |path|
     load File.expand_path(path, __FILE__)
   end
