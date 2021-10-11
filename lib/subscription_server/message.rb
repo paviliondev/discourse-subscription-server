@@ -62,7 +62,7 @@ class SubscriptionServer::Message
       type: type,
       created_at: Time.now
     )
-     find(id)
+      find(id)
     else
       false
     end
