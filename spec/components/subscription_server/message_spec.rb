@@ -8,8 +8,8 @@ describe SubscriptionServer::Message do
   end
 
   it "#create different types" do
-    message = described_class.create(message: "Info message", type: described_class.types[:error])
-    expect(message.type).to eq(described_class.types[:error])
+    message = described_class.create(message: "Warning message", type: described_class.types[:warning])
+    expect(message.type).to eq(described_class.types[:warning])
   end
 
   it "#find" do
@@ -20,7 +20,6 @@ describe SubscriptionServer::Message do
   it "#list" do
     described_class.create(message: "Info message")
     described_class.create(message: "Warning message", type: described_class.types[:warning])
-    described_class.create(message: "Error message", type: described_class.types[:error])
-    expect(described_class.list.length).to eq(3)
+    expect(described_class.list.length).to eq(2)
   end
 end
