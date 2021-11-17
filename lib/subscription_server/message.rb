@@ -4,6 +4,7 @@ class SubscriptionServer::Message
   include ActiveModel::Serialization
 
   attr_reader :id,
+              :title,
               :message,
               :type,
               :created_at,
@@ -11,6 +12,7 @@ class SubscriptionServer::Message
 
   def initialize(id, attrs)
     @id = id
+    @title = attrs[:title]
     @message = attrs[:message]
     @type = attrs[:type]
     @created_at = attrs[:created_at]
@@ -21,6 +23,7 @@ class SubscriptionServer::Message
     PluginStore.set(
       self.class.namespace,
       id,
+      title: title,
       message: message,
       type: type,
       created_at: created_at,
@@ -51,13 +54,14 @@ class SubscriptionServer::Message
     end
   end
 
-  def self.create(message: nil, type: 0)
-    id = Digest::SHA1.hexdigest(message)
+  def self.create(title: '', message: nil, type: 0)
+    id = Digest::SHA1.hexdigest(title)
     return false if find(id) || types.key(type).blank?
 
     if PluginStore.set(
       namespace,
       id,
+      title: title,
       message: message,
       type: type,
       created_at: Time.now

@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class SubscriptionServer::MessageSerializer < ApplicationSerializer
-  attributes :message,
+  attributes :title,
+             :message,
              :type,
              :created_at,
              :expired_at
