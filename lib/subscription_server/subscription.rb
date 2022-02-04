@@ -5,7 +5,7 @@ class SubscriptionServer::Subscription
               :price_id,
               :price_nickname
 
-  def initialize(product_id: nil, price_id: nil, price_nickname: nil)
+  def initialize(product_id: nil, price_id: nil, price_nickname: nil, product_name: nil)
     @product_id = product_id
     @product_name = product_name
     @price_id = price_id
