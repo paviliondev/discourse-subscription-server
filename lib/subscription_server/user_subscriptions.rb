@@ -25,10 +25,15 @@ class SubscriptionServer::UserSubscriptions
     return handle_failure("#{opts[:provider]} is not installed") unless provider.installed
     return handle_failure("failed to setup #{opts[:provider]}") unless provider.setup
 
-    provider_id = clients[opts[:client_name].to_sym]
-    return handle_failure("no provider found for #{opts[:client_name]}") unless provider_id
+    # if client_name has been provided, list the sub just for that, else return all subs.
+    if opts[:client_name].present?
+      provider_id = clients[opts[:client_name].to_sym]
+      return handle_failure("no provider found for #{opts[:client_name]}") unless provider_id
+      subscriptions = provider.load(provider_id)
+    else
+      subscriptions = provider.load(nil)
+    end
 
-    subscriptions = provider.load(provider_id)
     return handle_failure("no subscriptions found") unless subscriptions.any?
 
     @subscriptions = subscriptions

@@ -2,6 +2,7 @@
 
 SubscriptionServer::Engine.routes.draw do
   get '/user-subscriptions/:provider/:client_name' => 'user_subscriptions#index'
+  get '/user-subscriptions/:provider' => 'user_subscriptions#index'
   get '/messages' => 'messages#index'
 end
 

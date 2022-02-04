@@ -27,9 +27,12 @@ class SubscriptionServer::Stripe < SubscriptionServer::Provider
       sub_hash = sub.to_h
       price = sub_hash[:items][:data][0][:price]
 
-      if price[:product] == provider_id
+      if price[:product] == provider_id || provider_id == nil
+        product_name = ::Stripe::Product.retrieve(price[:product])["name"]
+
         subscription = SubscriptionServer::Subscription.new(
           product_id: price[:product],
+          product_name: product_name,
           price_id: price[:id],
           price_nickname: price[:nickname]
         )
