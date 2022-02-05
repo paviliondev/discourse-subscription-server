@@ -20,6 +20,7 @@ after_initialize do
     ../app/controllers/subscription_server/user_subscriptions_controller.rb
     ../app/controllers/subscription_server/messages_controller.rb
     ../app/serializers/subscription_server/message_serializer.rb
+    ../app/serializers/subscription_server/user_subscription_serializer.rb
   ].each do |path|
     load File.expand_path(path, __FILE__)
   end

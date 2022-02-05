@@ -9,7 +9,9 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
     user_subs.load(user_subscription_params.to_h)
 
     if user_subs.subscriptions.any?
-      render json: success_json.merge(subscriptions: user_subs.subscriptions.as_json)
+      render_json_dump(
+        subscriptions: ActiveModel::ArraySerializer.new(user_subs.subscriptions, each_serializer: SubscriptionServer::SubscriptionSerializer),
+      )
     else
       render json: failed_json.merge(error: user_subs.error), status: 404
     end
