@@ -10,7 +10,7 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
 
     if user_subs.subscriptions.any?
       render_json_dump(
-        subscriptions: ActiveModel::ArraySerializer.new(user_subs.subscriptions, each_serializer: SubscriptionServer::SubscriptionSerializer),
+        subscriptions: ActiveModel::ArraySerializer.new(user_subs.subscriptions, each_serializer: SubscriptionServer::SubscriptionSerializer)
       )
     else
       render json: failed_json.merge(error: user_subs.error), status: 404

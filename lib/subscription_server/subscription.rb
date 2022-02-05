@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 class SubscriptionServer::Subscription
+  include ActiveModel::Serialization
+
   attr_reader :product_id,
               :product_name,
               :price_id,
