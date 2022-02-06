@@ -3,5 +3,6 @@ class SubscriptionServer::SubscriptionSerializer < ::ApplicationSerializer
   attributes :product_id,
              :product_name,
              :price_id,
-             :price_nickname
+             :price_nickname,
+             :supplier_name
 end
