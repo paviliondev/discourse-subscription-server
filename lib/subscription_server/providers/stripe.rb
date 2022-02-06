@@ -29,12 +29,15 @@ class SubscriptionServer::Stripe < SubscriptionServer::Provider
 
       if price[:product] == provider_id || provider_id == nil
         product_name = ::Stripe::Product.retrieve(price[:product])["name"]
+        #TODO consider better source for Supplier Name
+        supplier_name = ::Stripe::Account.retrieve["settings"]["dashboard"]["display_name"]
 
         subscription = SubscriptionServer::Subscription.new(
           product_id: price[:product],
           product_name: product_name,
           price_id: price[:id],
-          price_nickname: price[:nickname]
+          price_nickname: price[:nickname],
+          supplier_name: supplier_name
         )
         result.push(subscription)
       end

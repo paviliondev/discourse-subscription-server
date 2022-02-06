@@ -1,7 +1,7 @@
 en:
   site_settings:
     subscription_server_enabled: Enable subscription server
-    subscription_server_supplier_name: The name of this plugin supplier
+    subscription_server_supplier_name: The name of this plugin supplier (if blank, is retrieved from payment system metadata)
     subscription_server_client_providers: Client names with provider identifiers, e.g. custom-wizard:prod_Jyy6B9gyTJUURi
 
   user_api_key:

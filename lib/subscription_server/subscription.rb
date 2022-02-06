@@ -8,11 +8,11 @@ class SubscriptionServer::Subscription
               :price_nickname,
               :supplier_name
 
-  def initialize(product_id: nil, price_id: nil, price_nickname: nil, product_name: nil)
+  def initialize(product_id: nil, price_id: nil, price_nickname: nil, product_name: nil, supplier_name: nil)
     @product_id = product_id
     @product_name = product_name
     @price_id = price_id
     @price_nickname = price_nickname
-    @supplier_name = SiteSetting.subscription_server_supplier_name
+    @supplier_name = (SiteSetting.subscription_server_supplier_name.empty? ? nil : SiteSetting.subscription_server_supplier_name) || supplier_name
   end
 end
