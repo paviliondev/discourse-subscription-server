@@ -9,7 +9,7 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
     user_subs.load(user_subscription_params.to_h)
 
     if user_subs.subscriptions.any?
-      render_json_dump(
+      render json: success_json.merge(
         subscriptions: ActiveModel::ArraySerializer.new(user_subs.subscriptions, each_serializer: SubscriptionServer::SubscriptionSerializer)
       )
     else
