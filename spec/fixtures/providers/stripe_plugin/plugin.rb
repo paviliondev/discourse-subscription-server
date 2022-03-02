@@ -41,13 +41,13 @@ module ::Stripe
 
   class Product
     def self.retrieve(stuff)
-      return {"name": "thingymagig plugin"}
+      { "name": "thingymagig plugin" }
     end
   end
 
   class Account
     def self.retrieve
-      return {"settings"=> {
+      { "settings" => {
         "dashboard" => {
           "display_name" => "acme ltd."
           }
