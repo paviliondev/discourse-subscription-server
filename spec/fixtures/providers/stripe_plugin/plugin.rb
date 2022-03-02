@@ -38,4 +38,21 @@ module ::Stripe
       customer_list.deep_symbolize_keys
     end
   end
+
+  class Product
+    def self.retrieve(stuff)
+      return {"name": "thingymagig plugin"}
+    end
+  end
+
+  class Account
+    def self.retrieve
+      return {"settings"=> {
+        "dashboard" => {
+          "display_name" => "acme ltd."
+          }
+        }
+      }
+    end
+  end
 end

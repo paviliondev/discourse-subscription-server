@@ -12,4 +12,3 @@ if ENV['SIMPLECOV']
 end
 
 require 'rails_helper'
-require_relative './fabricators/user_api_key_fabricator.rb'
