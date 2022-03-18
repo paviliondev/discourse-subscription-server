@@ -4,27 +4,34 @@ require_relative '../../plugin_helper'
 describe SubscriptionServer::UserSubscriptions do
   let(:user) { Fabricate(:user) }
   let(:provider) { "stripe" }
-  let(:client_name) { "custom_wizard" }
+  let(:invalid_provider) { "braintree" }
+  let(:provider_id) { "prod_CBTNpi3fqWWkq0" }
+  let(:resource) { "custom_wizard" }
+  let(:resource_providers) { "#{resource}:#{provider}:#{provider_id}" }
+  let(:resources) { [resource] }
 
   before do
     @instance = SubscriptionServer::UserSubscriptions.new(user)
   end
 
   def response_error(message)
-    "Failed to load subscriptions for #{user.username}: #{message}"
+    "Failed to load #{resource} subscriptions for #{user.username}: #{message}"
   end
 
-  context "load" do
-    it "requires a valid provider" do
-      invalid_provider = "braintree"
-      @instance.load(provider: invalid_provider, client_name: client_name)
-      expect(@instance.error).to eq(response_error("#{invalid_provider} is not a supported provider"))
+  it "requires a resource provider" do
+    @instance.load(resources)
+    expect(@instance.errors).to include(response_error("no provider found for #{resource}"))
+  end
+
+  context "with provider" do
+    before do
+      SiteSetting.subscription_server_resource_providers = resource_providers
     end
 
     it "requires the provider to be installed" do
       SubscriptionServer::Stripe.any_instance.stubs(:installed).returns(false)
-      @instance.load(provider: provider, client_name: client_name)
-      expect(@instance.error).to eq(response_error("#{provider} is not installed"))
+      @instance.load(resources)
+      expect(@instance.errors).to include(response_error("#{provider} is not installed"))
     end
 
     context "with provider installed" do
@@ -35,8 +42,8 @@ describe SubscriptionServer::UserSubscriptions do
       end
 
       it "requires the provider to be setup" do
-        @instance.load(provider: provider, client_name: client_name)
-        expect(@instance.error).to eq(response_error("failed to setup #{provider}"))
+        @instance.load(resources)
+        expect(@instance.errors).to include(response_error("failed to setup #{provider}"))
       end
 
       context "with provider setup" do
@@ -44,29 +51,18 @@ describe SubscriptionServer::UserSubscriptions do
           Stripe.api_key = "1234"
         end
 
-        it "requires a valid client" do
-          @instance.load(provider: provider, client_name: client_name)
-          expect(@instance.error).to eq(response_error("no provider found for #{client_name}"))
+        it "returns an error if no subscriptions" do
+          Stripe::Customer.has_subscription = false
+          @instance.load(resources)
+          expect(@instance.errors).to include(response_error("no subscriptions found for #{resource}"))
         end
 
-        context "with a valid client" do
-          before do
-            SiteSetting.subscription_server_client_providers = "custom_wizard:#{Stripe::PRODUCT_ID}"
-          end
-
-          it "returns an error if no subscriptions" do
-            Stripe::Customer.has_subscription = false
-            @instance.load(provider: provider, client_name: client_name)
-            expect(@instance.error).to eq(response_error("no subscriptions found"))
-          end
-
-          it "loads subscriptions" do
-            Stripe::Customer.has_subscription = true
-            @instance.load(provider: provider, client_name: client_name)
-            expect(@instance.error).to eq(nil)
-            expect(@instance.subscriptions.size).to eq(1)
-            expect(@instance.subscriptions.first.product_id).to eq(Stripe::PRODUCT_ID)
-          end
+        it "loads subscriptions" do
+          Stripe::Customer.has_subscription = true
+          @instance.load(resources)
+          expect(@instance.errors).to eq([])
+          expect(@instance.subscriptions.size).to eq(1)
+          expect(@instance.subscriptions.first.product_id).to eq(Stripe::PRODUCT_ID)
         end
       end
     end

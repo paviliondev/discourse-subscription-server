@@ -3,12 +3,12 @@
 class SubscriptionServer::UserSubscriptions
   attr_reader :user
   attr_accessor :subscriptions,
-                :error
+                :errors
 
   def initialize(user)
     @user = user
     @subscriptions = []
-    @error = nil
+    @errors = []
   end
 
   def self.providers
@@ -17,38 +17,49 @@ class SubscriptionServer::UserSubscriptions
     }
   end
 
-  def load(opts)
-    klass = self.class.providers[opts[:provider].to_sym]
-    return handle_failure("#{opts[:provider]} is not a supported provider") unless klass
+  def load(resources)
+    resources.each do |resource|
+      provider_atts = provider_map[resource]
+      next handle_failure(resource, "no provider found for #{resource}") unless provider_atts.present?
 
-    provider = klass.constantize.new(@user)
-    return handle_failure("#{opts[:provider]} is not installed") unless provider.installed
-    return handle_failure("failed to setup #{opts[:provider]}") unless provider.setup
+      klass = self.class.providers[provider_atts[:name].to_sym]
+      next handle_failure(resource, "#{provider_atts[:name]} is not a supported provider") unless klass
 
-    provider_id = clients[opts[:client_name].to_sym]
-    return handle_failure("no provider found for #{opts[:client_name]}") unless provider_id
+      provider = klass.constantize.new(@user)
+      next handle_failure(resource, "#{provider.name} is not installed") unless provider.installed
+      next handle_failure(resource, "failed to setup #{provider.name}") unless provider.setup
 
-    subscriptions = provider.load(provider_id)
-    return handle_failure("no subscriptions found") unless subscriptions.any?
+      resource_subscriptions = provider.subscriptions(provider_atts[:id], resource)
+      next handle_failure(resource, "no subscriptions found for #{resource}") unless resource_subscriptions.any?
+
+      subscriptions.push(*resource_subscriptions)
+    end
 
     @subscriptions = subscriptions
   end
 
   protected
 
-  def clients
-    @clients ||= SiteSetting.subscription_server_client_providers.split('|')
-      .reduce({}) do |result, item|
-        parts = item.split(':')
-        result[parts.first.to_sym] = parts.second
-        result
-      end
+  def provider_map
+    @provider_map ||= begin
+      SiteSetting.subscription_server_resource_providers.split('|')
+        .reduce({}) do |result, str|
+          parts = str.split(':')
+          if parts.size === 3
+            result[parts[0]] = {
+              name: parts[1],
+              id: parts[2]
+            }
+          end
+          result
+        end
+    end
   end
 
-  def handle_failure(message)
-    full_message = "Failed to load subscriptions for #{@user.username}: #{message}"
+  def handle_failure(resource, message)
+    full_message = "Failed to load #{resource } subscriptions for #{@user.username}: #{message}"
     Rails.logger.warn(full_message)
-    @error = full_message
+    @errors << full_message
     false
   end
 end

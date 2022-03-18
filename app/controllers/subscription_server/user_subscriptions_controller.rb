@@ -6,12 +6,12 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
 
   def index
     user_subs = SubscriptionServer::UserSubscriptions.new(current_user)
-    user_subs.load(user_subscription_params.to_h)
+    user_subs.load(user_subscription_params[:resources])
 
     if user_subs.subscriptions.any?
-      render json: success_json.merge(subscriptions: user_subs.subscriptions.as_json)
+      render json: success_json.merge(subscriptions: serialize_data(user_subs.subscriptions, SubscriptionServer::SubscriptionSerializer))
     else
-      render json: failed_json.merge(error: user_subs.error), status: 404
+      render json: failed_json.merge(error: user_subs.errors.join('\n')), status: 404
     end
   end
 
@@ -24,6 +24,7 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
   end
 
   def user_subscription_params
-    params.permit(:provider, :client_name)
+    params.require(:resources)
+    params.permit(resources: [])
   end
 end

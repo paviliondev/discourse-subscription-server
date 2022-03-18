@@ -19,7 +19,7 @@ class SubscriptionServer::Provider
     # Override in provider. Run second after initialization. Return true to continue.
   end
 
-  def load(provider_id)
+  def subscriptions(provider_id, resource_name)
     # Override in provider. Return list of SubscriptionServer::Subscription instances.
   end
 end

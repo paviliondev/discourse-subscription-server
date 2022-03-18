@@ -1,6 +1,5 @@
 plugins:
   subscription_server_enabled: true
-  subscription_server_client_providers:
+  subscription_server_resource_providers:
     type: list
     default: ''
-  
