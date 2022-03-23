@@ -19,6 +19,7 @@ after_initialize do
     ../config/routes.rb
     ../app/controllers/subscription_server/user_subscriptions_controller.rb
     ../app/controllers/subscription_server/messages_controller.rb
+    ../app/controllers/subscription_server/server_controller.rb
     ../app/serializers/subscription_server/message_serializer.rb
     ../app/serializers/subscription_server/subscription_serializer.rb
   ].each do |path|
