@@ -6,7 +6,7 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
 
   def index
     user_subs = SubscriptionServer::UserSubscriptions.new(current_user)
-    user_subs.load(user_subscription_params[:resources])
+    user_subs.load(resources)
 
     if user_subs.subscriptions.any?
       render json: success_json.merge(subscriptions: serialize_data(user_subs.subscriptions, SubscriptionServer::SubscriptionSerializer))
@@ -23,8 +23,13 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
     end
   end
 
-  def user_subscription_params
-    params.require(:resources)
-    params.permit(resources: [])
+  def resources
+    resources = params.permit(resources: [])
+
+    unless resources["resources"]
+      raise Discourse::InvalidParameters.new(:resources)
+    end
+
+    resources["resources"]
   end
 end
