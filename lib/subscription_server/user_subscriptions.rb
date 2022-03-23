@@ -26,6 +26,8 @@ class SubscriptionServer::UserSubscriptions
   end
 
   def load(resources)
+    return unless resources.present?
+
     resources.each do |resource|
       sub_atts = subscriptions_map[resource]
       next handle_failure(resource, "no subscription found for #{resource}") unless sub_atts.present?
