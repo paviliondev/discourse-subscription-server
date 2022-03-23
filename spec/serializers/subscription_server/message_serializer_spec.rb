@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../../plugin_helper'
-
 describe SubscriptionServer::MessageSerializer do
   it 'should return message attributes' do
     message = SubscriptionServer::Message.create(message: "Info message")

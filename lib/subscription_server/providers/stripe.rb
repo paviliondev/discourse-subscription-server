@@ -5,13 +5,16 @@ class SubscriptionServer::Stripe < SubscriptionServer::Provider
     'stripe'
   end
 
-  def installed
+  def installed?
     defined?(Stripe) == 'constant' && Stripe.class == Module
   end
 
+  def discourse_subscriptions_installed?
+    defined?(DiscourseSubscriptions) == 'constant' && DiscourseSubscriptions.class == Module
+  end
+
   def setup
-    if SiteSetting.respond_to?("discourse_subscriptions_secret_key") &&
-        SiteSetting.discourse_subscriptions_secret_key.present?
+    if installed? && discourse_subscriptions_installed?
       ::Stripe.api_key = SiteSetting.discourse_subscriptions_secret_key
     end
 

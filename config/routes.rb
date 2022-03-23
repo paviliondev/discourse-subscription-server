@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 SubscriptionServer::Engine.routes.draw do
+  get '/' => 'server#index'
   get '/user-subscriptions' => 'user_subscriptions#index'
   get '/messages' => 'messages#index'
 end

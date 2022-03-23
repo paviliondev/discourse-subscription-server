@@ -4,6 +4,7 @@ class SubscriptionServer::MessageSerializer < ApplicationSerializer
   attributes :title,
              :message,
              :type,
+             :resource,
              :created_at,
              :expired_at
 

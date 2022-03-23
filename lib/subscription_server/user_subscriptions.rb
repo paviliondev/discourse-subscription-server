@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 class SubscriptionServer::UserSubscriptions
+  cattr_accessor :providers do
+    {
+      stripe: "SubscriptionServer::Stripe"
+    }
+  end
+
   attr_reader :user
   attr_accessor :subscriptions,
                 :errors
@@ -11,10 +17,12 @@ class SubscriptionServer::UserSubscriptions
     @errors = []
   end
 
-  def self.providers
-    {
-      stripe: "SubscriptionServer::Stripe"
-    }
+  def self.add_provider(name, class_name)
+    providers[name] = class_name
+  end
+
+  def self.remove_provider(name)
+    providers.delete(name)
   end
 
   def load(resources)
@@ -22,11 +30,11 @@ class SubscriptionServer::UserSubscriptions
       provider_atts = provider_map[resource]
       next handle_failure(resource, "no provider found for #{resource}") unless provider_atts.present?
 
-      klass = self.class.providers[provider_atts[:name].to_sym]
+      klass = providers[provider_atts[:name].to_sym]
       next handle_failure(resource, "#{provider_atts[:name]} is not a supported provider") unless klass
 
       provider = klass.constantize.new(@user)
-      next handle_failure(resource, "#{provider.name} is not installed") unless provider.installed
+      next handle_failure(resource, "#{provider.name} is not installed") unless provider.installed?
       next handle_failure(resource, "failed to setup #{provider.name}") unless provider.setup
 
       resource_subscriptions = provider.subscriptions(provider_atts[:id], resource)
@@ -57,7 +65,7 @@ class SubscriptionServer::UserSubscriptions
   end
 
   def handle_failure(resource, message)
-    full_message = "Failed to load #{resource } subscriptions for #{@user.username}: #{message}"
+    full_message = "Failed to load #{resource} subscriptions for #{@user.username}: #{message}"
     Rails.logger.warn(full_message)
     @errors << full_message
     false

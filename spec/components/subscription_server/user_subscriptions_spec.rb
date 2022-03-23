@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require_relative '../../plugin_helper'
 
 describe SubscriptionServer::UserSubscriptions do
   let(:user) { Fabricate(:user) }
@@ -29,7 +28,7 @@ describe SubscriptionServer::UserSubscriptions do
     end
 
     it "requires the provider to be installed" do
-      SubscriptionServer::Stripe.any_instance.stubs(:installed).returns(false)
+      SubscriptionServer::Stripe.any_instance.stubs(:installed?).returns(false)
       @instance.load(resources)
       expect(@instance.errors).to include(response_error("#{provider} is not installed"))
     end

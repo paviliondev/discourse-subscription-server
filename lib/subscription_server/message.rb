@@ -7,6 +7,7 @@ class SubscriptionServer::Message
               :title,
               :message,
               :type,
+              :resource,
               :created_at,
               :expired_at
 
@@ -14,6 +15,7 @@ class SubscriptionServer::Message
     @id = id
     @title = attrs[:title]
     @message = attrs[:message]
+    @resource = attrs[:resource]
     @type = attrs[:type]
     @created_at = attrs[:created_at]
     @expired_at = attrs[:expired_at]
@@ -54,8 +56,9 @@ class SubscriptionServer::Message
     end
   end
 
-  def self.create(title: '', message: nil, type: 0)
-    id = Digest::SHA1.hexdigest(title)
+  def self.create(title: '', message: nil, type: 0, resource: nil)
+    created_at = Time.now.iso8601(3)
+    id = Digest::SHA1.hexdigest(title + created_at.to_s)
     return false if find(id) || types.key(type).blank?
 
     if PluginStore.set(
@@ -64,7 +67,8 @@ class SubscriptionServer::Message
       title: title,
       message: message,
       type: type,
-      created_at: Time.now
+      resource: resource,
+      created_at: created_at
     )
       find(id)
     else
