@@ -6,7 +6,7 @@ describe SubscriptionServer::UserSubscriptions do
   let(:invalid_provider) { "braintree" }
   let(:provider_id) { "prod_CBTNpi3fqWWkq0" }
   let(:resource) { "custom_wizard" }
-  let(:resource_providers) { "#{resource}:#{provider}:#{provider_id}" }
+  let(:subscriptions) { "#{resource}:#{provider}:#{provider_id}" }
   let(:resources) { [resource] }
 
   before do
@@ -17,14 +17,14 @@ describe SubscriptionServer::UserSubscriptions do
     "Failed to load #{resource} subscriptions for #{user.username}: #{message}"
   end
 
-  it "requires a resource provider" do
+  it "requires subscriptions" do
     @instance.load(resources)
-    expect(@instance.errors).to include(response_error("no provider found for #{resource}"))
+    expect(@instance.errors).to include(response_error("no subscription found for #{resource}"))
   end
 
-  context "with provider" do
+  context "with subscriptions" do
     before do
-      SiteSetting.subscription_server_resource_providers = resource_providers
+      SiteSetting.subscription_server_subscriptions = subscriptions
     end
 
     it "requires the provider to be installed" do

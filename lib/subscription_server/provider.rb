@@ -22,7 +22,7 @@ class SubscriptionServer::Provider
     # Run second after initialization. Return true to continue.
   end
 
-  def subscriptions(provider_id, resource_name)
+  def subscriptions(provider_ids, resource_name)
     # Return list of SubscriptionServer::Subscription instances.
   end
 end

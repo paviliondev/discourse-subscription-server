@@ -27,17 +27,17 @@ class SubscriptionServer::UserSubscriptions
 
   def load(resources)
     resources.each do |resource|
-      provider_atts = provider_map[resource]
-      next handle_failure(resource, "no provider found for #{resource}") unless provider_atts.present?
+      sub_atts = subscriptions_map[resource]
+      next handle_failure(resource, "no subscription found for #{resource}") unless sub_atts.present?
 
-      klass = providers[provider_atts[:name].to_sym]
-      next handle_failure(resource, "#{provider_atts[:name]} is not a supported provider") unless klass
+      klass = providers[sub_atts[:provider].to_sym]
+      next handle_failure(resource, "#{sub_atts[:provider]} is not a supported provider") unless klass
 
       provider = klass.constantize.new(@user)
       next handle_failure(resource, "#{provider.name} is not installed") unless provider.installed?
       next handle_failure(resource, "failed to setup #{provider.name}") unless provider.setup
 
-      resource_subscriptions = provider.subscriptions(provider_atts[:id], resource)
+      resource_subscriptions = provider.subscriptions(sub_atts[:provider_ids], resource)
       next handle_failure(resource, "no subscriptions found for #{resource}") unless resource_subscriptions.any?
 
       subscriptions.push(*resource_subscriptions)
@@ -48,16 +48,14 @@ class SubscriptionServer::UserSubscriptions
 
   protected
 
-  def provider_map
-    @provider_map ||= begin
-      SiteSetting.subscription_server_resource_providers.split('|')
+  def subscriptions_map
+    @subscriptions_map ||= begin
+      SiteSetting.subscription_server_subscriptions.split('|')
         .reduce({}) do |result, str|
           parts = str.split(':')
           if parts.size === 3
-            result[parts[0]] = {
-              name: parts[1],
-              id: parts[2]
-            }
+            result[parts[0]] ||= { provider: parts[1], provider_ids: [] }
+            result[parts[0]][:provider_ids] << parts[2]
           end
           result
         end

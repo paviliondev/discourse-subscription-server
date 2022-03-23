@@ -2,7 +2,7 @@ en:
   site_settings:
     subscription_server_enabled: Enable subscription server
     subscription_server_supplier_name: Supplier name, e.g. "Pavilion"
-    subscription_server_resource_providers: "Subscription providers for resources: formate: resource_name:provider_name:provider_id e.g. custom-wizard:stripe:prod_Jyy6B9gyTJUURi"
+    subscription_server_subscriptions: "List of supported subscriptions. resource_name:provider_name:provider_id e.g. custom-wizard:stripe:prod_Jyy6B9gyTJUURi"
 
   user_api_key:
     scopes:

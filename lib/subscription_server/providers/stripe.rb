@@ -21,7 +21,7 @@ class SubscriptionServer::Stripe < SubscriptionServer::Provider
     ::Stripe.api_key.present?
   end
 
-  def subscriptions(provider_id, resource_name)
+  def subscriptions(provider_ids, resource_name)
     customers = ::Stripe::Customer.list(email: @user.email, expand: ['data.subscriptions'])
     subscriptions = customers[:data].map { |c| c[:subscriptions][:data] }.flatten(1)
     return [] unless subscriptions.any?
@@ -30,7 +30,7 @@ class SubscriptionServer::Stripe < SubscriptionServer::Provider
       sub_hash = sub.to_h
       price = sub_hash[:items][:data][0][:price]
 
-      if price[:product] == provider_id
+      if provider_ids.include?(price[:product])
         product = ::Stripe::Product.retrieve(price[:product])
         subscription = SubscriptionServer::Subscription.new(
           resource: resource_name,
