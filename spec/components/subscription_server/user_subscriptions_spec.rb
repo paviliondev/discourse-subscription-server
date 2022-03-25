@@ -61,7 +61,12 @@ describe SubscriptionServer::UserSubscriptions do
           @instance.load(resources)
           expect(@instance.errors).to eq([])
           expect(@instance.subscriptions.size).to eq(1)
-          expect(@instance.subscriptions.first.product_id).to eq(Stripe::PRODUCT_ID)
+
+          subscription = @instance.subscriptions.first
+          expect(subscription.product_id).to eq(Stripe::PRODUCT_ID)
+          expect(subscription.product_name).to eq(Stripe::PRODUCT_NAME)
+          expect(subscription.price_id).to eq(Stripe::PRICE_ID)
+          expect(subscription.price_name).to eq(Stripe::PRICE_NAME)
         end
       end
     end
