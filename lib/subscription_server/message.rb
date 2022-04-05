@@ -78,7 +78,7 @@ class SubscriptionServer::Message
 
   def self.list_query(attr = nil, value = nil)
     query = PluginStoreRow.where(plugin_name: namespace)
-    query = query.where("(value::json->>'#{attr}') = ?", value) if attr && value
+    query = query.where("(value::json->>'#{attr.to_s}') = ?", value.to_s) if attr && value
     query.order("value::json->>'created_at' DESC")
   end
 
