@@ -28,6 +28,7 @@ class SubscriptionServer::Message
       title: title,
       message: message,
       type: type,
+      resource: resource,
       created_at: created_at,
       expired_at: Time.now
     )
