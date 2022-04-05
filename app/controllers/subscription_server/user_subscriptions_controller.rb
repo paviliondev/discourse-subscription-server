@@ -18,7 +18,7 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
   protected
 
   def ensure_can_access
-    unless is_user_api? && current_user.present?
+    unless is_user_api? && current_user.present? && user_api_key_has_required_scope?
       raise Discourse::InvalidAccess.new('user subscriptions requires authentication with user api')
     end
   end
@@ -31,5 +31,12 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
     end
 
     resources["resources"]
+  end
+
+  def user_api_key_has_required_scope?
+    user_api_key = request.env[Auth::DefaultCurrentUserProvider::USER_API_KEY]
+    hashed_user_api_key = ApiKey.hash_key(user_api_key)
+    user_api_key_record = UserApiKey.active.where(key_hash: hashed_user_api_key).first
+    user_api_key_record&.scopes&.any? { |scope| scope.name == SubscriptionServer::UserSubscriptions::SCOPE }
   end
 end

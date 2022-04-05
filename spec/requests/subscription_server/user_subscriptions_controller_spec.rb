@@ -2,11 +2,12 @@
 
 describe SubscriptionServer::UserSubscriptionsController do
   let(:user) { Fabricate(:user) }
-  let(:user_api_key) { Fabricate(:subscription_server_user_api_key, user: user) }
+  let(:subscription_user_api_key) { Fabricate(:subscription_server_user_api_key, user: user) }
+  let(:readonly_user_api_key) { Fabricate(:readonly_user_api_key, user: user) }
   let(:provider) { "stripe" }
   let(:resource) { "custom_wizard" }
 
-  it "requires a user authenticated via the user api" do
+  it "requires a user authenticated with a user api key" do
     get "/subscription-server/user-subscriptions"
     expect(response.status).to eq(403)
 
@@ -15,9 +16,14 @@ describe SubscriptionServer::UserSubscriptionsController do
     expect(response.status).to eq(403)
   end
 
+  it "requires a user authenticated with a user api key with the user_subscriptions scope" do
+    get "/subscription-server/user-subscriptions", headers: { HTTP_USER_API_KEY: readonly_user_api_key.key }
+    expect(response.status).to eq(403)
+  end
+
   context "authenticated" do
     def headers
-      { HTTP_USER_API_KEY: user_api_key.key }
+      { HTTP_USER_API_KEY: subscription_user_api_key.key }
     end
 
     context "#index" do
