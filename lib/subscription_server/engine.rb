@@ -7,4 +7,7 @@ module ::SubscriptionServer
     isolate_namespace SubscriptionServer
     engine_name PLUGIN_NAME
   end
+
+  # extensions namespace
+  class Extensions; end
 end

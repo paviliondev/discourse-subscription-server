@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class SubscriptionServer::UserSubscriptions
+  SCOPE ||= "discourse-subscription-server:user_subscription"
+
   cattr_accessor :providers do
     {
       stripe: "SubscriptionServer::Stripe"
