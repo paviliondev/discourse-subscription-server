@@ -47,6 +47,8 @@ after_initialize do
     value_arr = value_str.split('|')
     value_arr << domain
     custom_fields[key] = value_arr.join('|')
+
+    save_custom_fields(true)
   end
 
   add_to_class(:user, :subscription_product_domains) do |resource_name, provider_name, product_id|
@@ -61,7 +63,7 @@ after_initialize do
 
     custom_fields
       .select { |key, _| key.include?(SubscriptionServer::UserSubscriptions::DOMAINS_KEY_PREFIX) }
-      .map do |key, value|
+      .each do |key, value|
         key_parts = key.split(':')
 
         subscription_domains[key_parts[1]] ||= { products: [], domains: [] }
@@ -75,6 +77,10 @@ after_initialize do
         .sum { |limit| limit[:domain_limit] }
     end
 
-    subscription_domains
+    subscription_domains.reduce([]) do |result, (resource, data)|
+      data[:resource] = resource
+      result << data
+      result
+    end
   end
 end

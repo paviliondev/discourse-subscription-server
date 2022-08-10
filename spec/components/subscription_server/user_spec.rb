@@ -27,8 +27,10 @@ describe User do
 
   it "#subscription_domains" do
     user.add_subscription_product_domain(domain, resource, provider, product_id)
-    expect(user.subscription_domains[resource][:products]).to eq([product_id])
-    expect(user.subscription_domains[resource][:domains]).to eq([domain])
-    expect(user.subscription_domains[resource][:domain_limit]).to eq(1)
+    expect(user.subscription_domains.size).to eq(1)
+    expect(user.subscription_domains.first[:resource]).to eq(resource)
+    expect(user.subscription_domains.first[:products]).to eq([product_id])
+    expect(user.subscription_domains.first[:domains]).to eq([domain])
+    expect(user.subscription_domains.first[:domain_limit]).to eq(1)
   end
 end
