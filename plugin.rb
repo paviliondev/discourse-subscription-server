@@ -2,7 +2,7 @@
 
 # name: discourse-subscription-server
 # about: Use Discourse as a subscription server
-# version: 0.3.0
+# version: 0.3.1
 # url: https://github.com/paviliondev/discourse-subscription-server
 # authors: Angus McLeod
 
