@@ -2,7 +2,7 @@
 
 # name: discourse-subscription-server
 # about: Use Discourse as a subscription server
-# version: 0.2.0
+# version: 0.3.0
 # url: https://github.com/paviliondev/discourse-subscription-server
 # authors: Angus McLeod
 
@@ -36,4 +36,45 @@ after_initialize do
     actions: "subscription_server/user_subscriptions#index",
     params: :client_name
   )
+
+  add_to_class(:user, :subscription_product_domain_key) do |resource_name, provider_name, product_id|
+    "#{SubscriptionServer::UserSubscriptions::DOMAINS_KEY_PREFIX}:#{resource_name}:#{provider_name}:#{product_id}"
+  end
+
+  add_to_class(:user, :add_subscription_product_domain) do |domain, resource_name, provider_name, product_id|
+    key = subscription_product_domain_key(resource_name, provider_name, product_id)
+    value_str = (custom_fields[key] || "")
+    value_arr = value_str.split('|')
+    value_arr << domain
+    custom_fields[key] = value_arr.join('|')
+  end
+
+  add_to_class(:user, :subscription_product_domains) do |resource_name, provider_name, product_id|
+    key = subscription_product_domain_key(resource_name, provider_name, product_id)
+    product_domains = custom_fields[key]
+    (product_domains || "").split('|')
+  end
+
+  add_to_class(:user, :subscription_domains) do
+    subscriptions_map = SubscriptionServer::UserSubscriptions.subscriptions_map
+    subscription_domains = {}
+
+    custom_fields
+      .select { |key, _| key.include?(SubscriptionServer::UserSubscriptions::DOMAINS_KEY_PREFIX) }
+      .map do |key, value|
+        key_parts = key.split(':')
+
+        subscription_domains[key_parts[1]] ||= { products: [], domains: [] }
+        subscription_domains[key_parts[1]][:products] << key_parts[3]
+        subscription_domains[key_parts[1]][:domains].concat value.split('|')
+      end
+
+    subscription_domains.each do |resource, data|
+      data[:domain_limit] = subscriptions_map[resource][:domain_limits]
+        .select { |limit| data[:products].include?(limit[:product_id]) }
+        .sum { |limit| limit[:domain_limit] }
+    end
+
+    subscription_domains
+  end
 end

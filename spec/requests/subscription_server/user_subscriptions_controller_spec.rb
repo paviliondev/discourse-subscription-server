@@ -6,6 +6,7 @@ describe SubscriptionServer::UserSubscriptionsController do
   let(:readonly_user_api_key) { Fabricate(:readonly_user_api_key, user: user) }
   let(:provider) { "stripe" }
   let(:resource) { "custom_wizard" }
+  let(:client) { "https://demo.pavilion.tech" }
 
   it "requires a user authenticated with a user api key" do
     get "/subscription-server/user-subscriptions"
@@ -21,12 +22,12 @@ describe SubscriptionServer::UserSubscriptionsController do
     expect(response.status).to eq(403)
   end
 
-  context "authenticated" do
+  context "when authenticated" do
     def headers
-      { HTTP_USER_API_KEY: subscription_user_api_key.key }
+      { HTTP_USER_API_KEY: subscription_user_api_key.key, ORIGIN: client }
     end
 
-    context "#index" do
+    describe "#index" do
       before do
         @subscription = SubscriptionServer::Subscription.new(
           resource: resource,
@@ -35,6 +36,11 @@ describe SubscriptionServer::UserSubscriptionsController do
           price_id: "price_id",
           price_name: "yearly"
         )
+      end
+
+      it "requires a request origin" do
+        get "/subscription-server/user-subscriptions", headers: headers.except(:ORIGIN)
+        expect(response.status).to eq(400)
       end
 
       it "returns subscription list if SubscriptionServer::UserSubscriptions loads subcriptions" do

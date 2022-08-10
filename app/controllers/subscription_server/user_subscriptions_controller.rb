@@ -5,7 +5,17 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
   before_action :ensure_can_access
 
   def index
-    user_subs = SubscriptionServer::UserSubscriptions.new(current_user)
+    begin
+      domain = request.origin && Addressable::URI.parse(request.origin).host
+    rescue Addressable::URI::InvalidURIError
+      domain = nil
+    end
+
+    unless domain
+      raise Discourse::InvalidParameters.new('user subscriptions require a valid request origin')
+    end
+
+    user_subs = SubscriptionServer::UserSubscriptions.new(current_user, domain)
     user_subs.load(resources)
 
     if user_subs.subscriptions.any?
