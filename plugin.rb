@@ -5,6 +5,7 @@
 # version: 0.3.1
 # url: https://github.com/paviliondev/discourse-subscription-server
 # authors: Angus McLeod
+# contact_emails: development@pavilion.tech
 
 enabled_site_setting :subscription_server_enabled
 
