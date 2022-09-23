@@ -46,7 +46,7 @@ after_initialize do
     key = subscription_product_domain_key(resource_name, provider_name, product_id)
     value_str = (custom_fields[key] || "")
     value_arr = value_str.split('|')
-    value_arr << domain
+    value_arr << domain unless value_arr.include?(domain)
     custom_fields[key] = value_arr.join('|')
 
     save_custom_fields(true)
@@ -55,7 +55,7 @@ after_initialize do
   add_to_class(:user, :subscription_product_domains) do |resource_name, provider_name, product_id|
     key = subscription_product_domain_key(resource_name, provider_name, product_id)
     product_domains = custom_fields[key]
-    (product_domains || "").split('|')
+    (product_domains || "").split('|').uniq
   end
 
   add_to_class(:user, :subscription_domains) do

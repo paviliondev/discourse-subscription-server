@@ -19,6 +19,12 @@ describe User do
     expect(user.custom_fields[user.subscription_product_domain_key(resource, provider, product_id)]).to eq(domain)
   end
 
+  it "#add_subscription_product_domain does not duplicate domains" do
+    user.add_subscription_product_domain(domain, resource, provider, product_id)
+    user.add_subscription_product_domain(domain, resource, provider, product_id)
+    expect(user.custom_fields[user.subscription_product_domain_key(resource, provider, product_id)]).to eq(domain)
+  end
+
   it "#subscription_product_domains" do
     user.add_subscription_product_domain(domain, resource, provider, product_id)
     user.add_subscription_product_domain(another_domain, resource, provider, product_id)
