@@ -93,6 +93,14 @@ describe SubscriptionServer::UserSubscriptions do
             expect(instance.errors).to include(response_error("domain limit reached for #{resource}"))
           end
 
+          it "doesn't return an error if the domain is the same as an existing domain registered by the user" do
+            @instance.load(resources)
+            instance = SubscriptionServer::UserSubscriptions.new(user, domain)
+            instance.load(resources)
+            expect(instance.errors).to eq([])
+            expect(instance.subscriptions.size).to eq(1)
+          end
+
           it "loads subscriptions if the domain limit is not exceeded" do
             SiteSetting.subscription_server_subscriptions = subscriptions + ":2"
 

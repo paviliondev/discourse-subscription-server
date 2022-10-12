@@ -116,6 +116,8 @@ class SubscriptionServer::UserSubscriptions
       resource_domains.concat product_domains
     end
 
+    return false if resource_domains.include?(@domain)
+
     resource_domains.size >= resource_domain_limit
   end
 end
