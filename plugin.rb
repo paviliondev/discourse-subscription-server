@@ -2,7 +2,7 @@
 
 # name: discourse-subscription-server
 # about: Use Discourse as a subscription server
-# version: 0.3.1
+# version: 0.3.2
 # url: https://github.com/paviliondev/discourse-subscription-server
 # authors: Angus McLeod
 # contact_emails: development@pavilion.tech
@@ -47,6 +47,16 @@ after_initialize do
     value_str = (custom_fields[key] || "")
     value_arr = value_str.split('|')
     value_arr << domain unless value_arr.include?(domain)
+    custom_fields[key] = value_arr.join('|')
+
+    save_custom_fields(true)
+  end
+
+  add_to_class(:user, :remove_subscription_product_domain) do |domain, resource_name, provider_name, product_id|
+    key = subscription_product_domain_key(resource_name, provider_name, product_id)
+    value_str = (custom_fields[key] || "")
+    value_arr = value_str.split('|')
+    value_arr = value_arr.reject { |d| d === domain }
     custom_fields[key] = value_arr.join('|')
 
     save_custom_fields(true)
