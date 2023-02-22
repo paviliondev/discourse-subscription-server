@@ -35,7 +35,7 @@ class SubscriptionServer::UserSubscriptions
     return unless resources.present? && @user.present? && @domain.present?
 
     resources.each do |resource|
-      sub_atts = subscriptions_map[resource]
+      sub_atts = SubscriptionServer::Subscription.map[resource]
       next handle_failure(resource, "no subscription found for #{resource}") unless sub_atts.present?
 
       klass = providers[sub_atts[:provider].to_sym]
@@ -62,36 +62,6 @@ class SubscriptionServer::UserSubscriptions
     end
 
     @subscriptions = subscriptions
-  end
-
-  def subscriptions_map
-    @subscriptions_map ||= begin
-      SiteSetting.subscription_server_subscriptions.split('|')
-        .reduce({}) do |result, str|
-          parts = str.split(':')
-
-          if parts.size >= 3
-            resource = parts[0]
-            provider = parts[1]
-            product_id = parts[2]
-            domain_limit = parts[3]
-
-            result[resource] ||= { provider: provider, product_ids: [] }
-            result[resource][:product_ids] << product_id
-
-            if domain_limit
-              result[resource][:domain_limits] ||= []
-              result[resource][:domain_limits] << { product_id: product_id, domain_limit: domain_limit.to_i }
-            end
-          end
-
-          result
-        end
-    end
-  end
-
-  def self.subscriptions_map
-    new.subscriptions_map
   end
 
   protected
