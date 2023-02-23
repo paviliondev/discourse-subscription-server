@@ -69,7 +69,7 @@ after_initialize do
   end
 
   add_to_class(:user, :subscription_domains) do
-    subscriptions_map = SubscriptionServer::Subscription.map
+    subscriptions_map = SubscriptionServer::Subscription.subscription_map
     subscription_domains = {}
 
     custom_fields

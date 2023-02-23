@@ -35,7 +35,7 @@ class SubscriptionServer::UserSubscriptions
     return unless resources.present? && @user.present? && @domain.present?
 
     resources.each do |resource|
-      sub_atts = SubscriptionServer::Subscription.map[resource]
+      sub_atts = SubscriptionServer::Subscription.subscription_map[resource]
       next handle_failure(resource, "no subscription found for #{resource}") unless sub_atts.present?
 
       klass = providers[sub_atts[:provider].to_sym]
@@ -45,7 +45,8 @@ class SubscriptionServer::UserSubscriptions
       next handle_failure(resource, "#{provider.name} is not installed") unless provider.installed?
       next handle_failure(resource, "failed to setup #{provider.name}") unless provider.setup
 
-      resource_subscriptions = provider.subscriptions(sub_atts[:product_ids], resource)
+      product_ids = sub_atts[:products].map { |p| p[:product_id] }
+      resource_subscriptions = provider.subscriptions(product_ids, resource)
       next handle_failure(resource, "no subscriptions found for #{resource}") unless resource_subscriptions.any?
 
       product_ids = resource_subscriptions.map(&:product_id)
