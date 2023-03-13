@@ -24,7 +24,7 @@ class SubscriptionServer::Stripe < SubscriptionServer::Provider
   def subscriptions(product_ids, resource_name)
     customers = ::Stripe::Customer.list(email: @user.email, expand: ['data.subscriptions'])
     subscriptions = customers[:data].map { |c| c[:subscriptions][:data] }.flatten(1)
-    return [] unless subscriptions.any?
+    return [] if subscriptions.none?
 
     subscriptions.reduce([]) do |result, sub|
       sub_hash = sub.to_h
