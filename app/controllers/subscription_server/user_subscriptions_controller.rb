@@ -18,11 +18,7 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
     user_subs = SubscriptionServer::UserSubscriptions.new(current_user, domain)
     user_subs.load(resources)
 
-    if user_subs.subscriptions.any?
-      render json: success_json.merge(subscriptions: serialize_data(user_subs.subscriptions, SubscriptionServer::SubscriptionSerializer))
-    else
-      render json: failed_json.merge(error: user_subs.errors.join('\n')), status: 404
-    end
+    render json: success_json.merge(subscriptions: serialize_data(user_subs.subscriptions, SubscriptionServer::SubscriptionSerializer))
   end
 
   protected

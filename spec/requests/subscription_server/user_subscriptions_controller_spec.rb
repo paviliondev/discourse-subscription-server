@@ -55,9 +55,15 @@ describe SubscriptionServer::UserSubscriptionsController do
         )
       end
 
-      it "returns error if SubscriptionServer::UserSubscriptions does not load subscriptions" do
+      it "returns a blank array if SubscriptionServer::UserSubscriptions does not load any subscriptions" do
         get "/subscription-server/user-subscriptions", headers: headers, params: { resources: [resource] }
-        expect(response.status).to eq(404)
+        expect(response.status).to eq(200)
+        expect(response.parsed_body).to eq(
+          {
+            success: "OK",
+            subscriptions: [].as_json
+          }.as_json
+        )
       end
     end
   end
