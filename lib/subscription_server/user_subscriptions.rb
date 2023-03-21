@@ -46,7 +46,7 @@ class SubscriptionServer::UserSubscriptions
       next handle_failure(resource, "failed to setup #{provider.name}") unless provider.setup
 
       product_ids = sub_atts[:products].map { |p| p[:product_id] }
-      resource_subscriptions = provider.subscriptions(sub_atts[:product_ids], resource)
+      resource_subscriptions = provider.subscriptions(product_ids, resource)
       next handle_failure(resource, "no subscriptions found for #{resource}") if resource_subscriptions.none?
 
       product_ids = resource_subscriptions.map(&:product_id)
