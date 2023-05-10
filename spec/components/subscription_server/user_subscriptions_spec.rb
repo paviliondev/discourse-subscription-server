@@ -5,8 +5,9 @@ describe SubscriptionServer::UserSubscriptions do
   let(:provider) { "stripe" }
   let(:invalid_provider) { "braintree" }
   let(:product_id) { "prod_CBTNpi3fqWWkq0" }
+  let(:product_slug) { "business" }
   let(:resource) { "custom_wizard" }
-  let(:subscriptions) { "#{resource}:#{provider}:#{product_id}" }
+  let(:subscriptions) { "#{resource}:#{product_slug}:#{provider}:#{product_id}" }
   let(:resources) { [resource] }
   let(:domain) { "demo.pavilion.tech" }
 

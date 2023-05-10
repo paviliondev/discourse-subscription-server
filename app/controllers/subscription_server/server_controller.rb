@@ -5,7 +5,10 @@ class SubscriptionServer::ServerController < ApplicationController
 
   def index
     if SiteSetting.subscription_server_supplier_name.present?
-      render json: success_json.merge(supplier: SiteSetting.subscription_server_supplier_name)
+      render json: success_json.merge(
+        supplier: SiteSetting.subscription_server_supplier_name,
+        products: SubscriptionServer::Subscription.product_map
+      )
     else
       render json: failed_json, status: 404
     end

@@ -4,11 +4,12 @@ describe User do
   fab!(:user) { Fabricate(:user) }
   let(:provider) { "stripe" }
   let(:product_id) { "prod_CBTNpi3fqWWkq0" }
+  let(:product_slug) { "business" }
   let(:resource) { "custom_wizard" }
   let(:domain) { "demo.pavilion.tech" }
   let(:another_domain) { "another.pavilion.tech" }
   let(:domain_limit) { 1 }
-  let(:subscriptions) { "#{resource}:#{provider}:#{product_id}:#{domain_limit.to_s}" }
+  let(:subscriptions) { "#{resource}:#{product_slug}:#{provider}:#{product_id}:#{domain_limit.to_s}" }
 
   before do
     SiteSetting.subscription_server_subscriptions = subscriptions
