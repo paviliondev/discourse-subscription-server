@@ -8,6 +8,7 @@
 # contact_emails: development@pavilion.tech
 
 enabled_site_setting :subscription_server_enabled
+register_asset "stylesheets/common/common.scss"
 
 after_initialize do
   %w[
@@ -21,10 +22,14 @@ after_initialize do
     ../lib/subscription_server/extensions/user_api_keys_controller.rb
     ../config/routes.rb
     ../app/controllers/subscription_server/user_subscriptions_controller.rb
+    ../app/controllers/subscription_server/user_authorizations_controller.rb
     ../app/controllers/subscription_server/messages_controller.rb
     ../app/controllers/subscription_server/server_controller.rb
     ../app/serializers/subscription_server/message_serializer.rb
     ../app/serializers/subscription_server/subscription_serializer.rb
+    ../extensions/discourse_subscriptions_coupons_controller_extension.rb
+    ../extensions/discourse_subscriptions_products_controller_extension.rb
+    ../extensions/discourse_subscriptions_subscriber_controller_extension.rb
   ].each do |path|
     load File.expand_path(path, __FILE__)
   end
@@ -62,6 +67,17 @@ after_initialize do
     save_custom_fields(true)
   end
 
+  add_to_class(:user, :remove_subscription_domain) do |domain|
+    self._custom_fields.where(
+      "name LIKE '#{SubscriptionServer::UserSubscriptions::DOMAINS_KEY_PREFIX}%'"
+    ).each do |field|
+      value_arr = field.value.split('|')
+      value_arr = value_arr.reject { |d| d === domain }
+      field.value = value_arr.join('|')
+      field.save!
+    end
+  end
+
   add_to_class(:user, :subscription_product_domains) do |resource_name, provider_name, product_id|
     key = subscription_product_domain_key(resource_name, provider_name, product_id)
     product_domains = custom_fields[key]
@@ -92,6 +108,32 @@ after_initialize do
       data[:resource] = resource
       result << data
       result
+    end
+  end
+
+  add_to_serializer(:user, :subscription_domains) { user.subscription_domains }
+
+  ## DiscourseSubscription extensions. discourse-subscriptions plugin must be above this plugin in app.yml
+  DiscourseSubscriptions::SubscribeController.prepend DiscourseSubscriptionsSubscribeControllerExtension
+  DiscourseSubscriptions::Admin::CouponsController.prepend DiscourseSubscriptionsCouponsControllerExtension
+  DiscourseSubscriptions::Admin::ProductsController.prepend DiscourseSubscriptionsProductsControllerExtension
+
+  require 'csv'
+  module ::DiscourseSubscriptions
+    def self.class_update_subscriptions_from_csv(path)
+      rows = CSV.read(path)
+      return unless rows.present?
+
+      rows.each do |row|
+        DiscourseSubscriptions::Subscription
+          .joins(:customer)
+          .where("discourse_subscriptions_customers.customer_id = :customer_id AND discourse_subscriptions_subscriptions.external_id = :subscription_id",
+            customer_id: row[0].strip,
+            subscription_id: row[1].strip
+          ).update_all(
+            external_id: row[2].strip
+          )
+      end
     end
   end
 end

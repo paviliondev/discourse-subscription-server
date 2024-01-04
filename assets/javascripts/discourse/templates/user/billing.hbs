@@ -1,0 +1,29 @@
+{{#d-section
+  pageClass="user-billing"
+  class="user-secondary-navigation"
+  scrollTop="false"
+}}
+  <div class="user-navigation user-navigation-secondary">
+    <HorizontalOverflowNav @ariaLabel="User secondary - billing">
+      <NavItem
+        @route="user.billing.subscriptions"
+        @i18nLabel={{i18n "discourse_subscriptions.navigation.subscriptions"}}
+      />
+      <NavItem
+        @route="user.billing.payments"
+        @i18nLabel={{i18n "discourse_subscriptions.navigation.payments"}}
+      />
+      <NavItem
+        @route="user.billing.authorizations"
+        @i18nLabel={{i18n "discourse_subscriptions.navigation.authorizations"}}
+      />
+      <li>
+        <SubscriptionInvoicesBtn />
+      </li>
+    </HorizontalOverflowNav>
+  </div>
+{{/d-section}}
+
+<section class="user-content">
+  {{outlet}}
+</section>

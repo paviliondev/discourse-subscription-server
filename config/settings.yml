@@ -4,3 +4,18 @@ plugins:
   subscription_server_subscriptions:
     type: list
     default: ''
+  custom_wizard_community_subscription_description:
+    client: true
+    default: 'Custom Wizard Community Subscription Description'
+  custom_wizard_enterprise_subscription_description:
+    client: true
+    default: 'Custom Wizard Enterprise Subscription Description'
+  custom_wizard_community_subscription_href:
+    client: true
+    default: 'https://coop.pavilion.tech/w/community-subscription'
+  custom_wizard_enterprise_subscription_href:
+    client: true
+    default: 'https://calendly.com/book-pavilion/initial-consult'
+  custom_wizard_subscription_banner:
+    client: true
+    default: ''

@@ -46,4 +46,13 @@ describe User do
     expect(user.subscription_domains.first[:domains]).to eq([domain])
     expect(user.subscription_domains.first[:domain_limit]).to eq(1)
   end
+
+  it "#remove_subscription_domain" do
+    user.add_subscription_product_domain(domain, resource, provider, product_id)
+    user.add_subscription_product_domain(domain, resource, provider, "prod_12345")
+    user.remove_subscription_domain(domain)
+    user.reload
+    expect(user.custom_fields[user.subscription_product_domain_key(resource, provider, product_id)]).to eq("")
+    expect(user.custom_fields[user.subscription_product_domain_key(resource, provider, "prod_12345")]).to eq("")
+  end
 end
