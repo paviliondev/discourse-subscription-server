@@ -1,8 +1,0 @@
-en:
-  js:
-    discourse_subscriptions:
-      admin:
-        products:
-          product:
-            plugin_name: Plugin Name
-            plugin_name_help: Name of plugin subscription is for. If filled, will generate API Key with subscription.

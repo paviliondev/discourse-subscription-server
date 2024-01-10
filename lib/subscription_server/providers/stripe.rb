@@ -45,4 +45,8 @@ class SubscriptionServer::Stripe < SubscriptionServer::Provider
       result
     end
   end
+
+  def self.discourse_subscriptions_installed?
+    new.discourse_subscriptions_installed?
+  end
 end

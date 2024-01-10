@@ -1,5 +1,7 @@
 plugins:
-  subscription_server_enabled: true
+  subscription_server_enabled:
+    client: true
+    default: true
   subscription_server_supplier_name: ''
   subscription_server_subscriptions:
     type: list
