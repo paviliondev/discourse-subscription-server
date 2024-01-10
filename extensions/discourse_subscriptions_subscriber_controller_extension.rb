@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module DiscourseSubscriptionsSubscribeControllerExtension
   private def serialize_product(product)
     {

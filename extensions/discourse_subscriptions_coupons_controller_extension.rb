@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module DiscourseSubscriptionsCouponsControllerExtension
   def create
     params.require([:promo, :discount_type, :discount, :active, :applies_to_products])
