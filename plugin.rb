@@ -8,7 +8,6 @@
 # contact_emails: development@pavilion.tech
 
 enabled_site_setting :subscription_server_enabled
-register_asset "stylesheets/common/common.scss"
 
 after_initialize do
   %w[
@@ -134,6 +133,12 @@ after_initialize do
             external_id: row[2].strip
           )
       end
+    end
+  end
+
+  on(:after_plugin_activation) do
+    Discourse.plugins.sort_by! do |plugin|
+      plugin.name == 'discourse-subscription-server' ? 1 : 0
     end
   end
 end
