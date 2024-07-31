@@ -10,10 +10,10 @@
 enabled_site_setting :subscription_server_enabled
 
 DiscourseEvent.on(:after_plugin_activation) do
-  sorted_pugins = Discourse.plugins.sort_by do |p|
-    p&.name == 'discourse-subscription-server' ? 1 : 0
+  server_plugin, plugins = Discourse.plugins.partition do |p|
+    p&.name == 'discourse-subscription-server'
   end
-  Discourse.instance_variable_set(:@plugins, sorted_pugins)
+  Discourse.instance_variable_set(:@plugins, plugins + server_plugin)
 end
 
 after_initialize do
