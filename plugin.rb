@@ -7,6 +7,8 @@
 # authors: Angus McLeod
 # contact_emails: development@pavilion.tech
 
+gem "aws-sdk-iam", "1.96.0"
+
 enabled_site_setting :subscription_server_enabled
 
 DiscourseEvent.on(:after_plugin_activation) do
@@ -26,6 +28,7 @@ after_initialize do
     ../lib/subscription_server/user_subscriptions.rb
     ../lib/subscription_server/extensions/user_api_key.rb
     ../lib/subscription_server/extensions/user_api_keys_controller.rb
+    ../lib/subscription_server/aws.rb
     ../config/routes.rb
     ../app/controllers/subscription_server/user_subscriptions_controller.rb
     ../app/controllers/subscription_server/user_authorizations_controller.rb
