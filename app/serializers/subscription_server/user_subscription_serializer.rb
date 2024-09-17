@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SubscriptionServer::SubscriptionSerializer < ApplicationSerializer
+class SubscriptionServer::UserSubscriptionSerializer < ApplicationSerializer
   attributes :resource,
              :product_id,
              :product_name,

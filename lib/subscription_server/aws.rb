@@ -3,6 +3,9 @@ module SubscriptionServer
   class AWS
     KEY_QUOTA = 2
 
+    class SettingMissing < StandardError
+    end
+
     def initialize(options = {})
       @options = default_options.merge(options)
     end
@@ -22,7 +25,7 @@ module SubscriptionServer
       key
     end
 
-    def rotate_user(user_name: nil)
+    def rotate_key(user_name: nil)
       return unless user_name
 
       key_limit = KEY_QUOTA - 1
@@ -53,6 +56,15 @@ module SubscriptionServer
       end
 
       new_key
+    end
+
+    def expire_keys(user_name: nil)
+      keys = iam_list_keys(user_name: user_name)
+      if keys.present?
+        keys.each do |key|
+          iam_update_key(user_name: user_name, key_id: key[:access_key_id], status: "Inactive")
+        end
+      end
     end
 
     def destroy_user(user_name: nil)
@@ -178,14 +190,9 @@ module SubscriptionServer
       @iam_client ||= init_iam_client
     end
 
-    def stub_iam_client_responses!
-      raise "This method is only allowed to be used in the testing environment" if !Rails.env.test?
-      @iam_client = init_aws_iam_iam_client(stub_responses: true)
-    end
-
-    def init_iam_client(stub_responses: false)
+    def init_iam_client
       options = @options
-      options = options.merge(stub_responses: true) if stub_responses
+      options = options.merge(stub_responses: true) if Rails.env.test?
       Aws::IAM::Client.new(options)
     end
 

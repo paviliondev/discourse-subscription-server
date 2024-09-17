@@ -65,6 +65,10 @@ class SubscriptionServer::UserSubscriptions
     @subscriptions = subscriptions
   end
 
+  def self.load(user, domain, resources)
+    new(user, domain).load(resources)
+  end
+
   protected
 
   def handle_failure(resource, message)
