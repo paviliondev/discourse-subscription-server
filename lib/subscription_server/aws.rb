@@ -199,6 +199,7 @@ module SubscriptionServer
     def default_options
       check_missing_options
       {
+        region: SiteSetting.subscription_server_iam_region,
         access_key_id: SiteSetting.subscription_server_iam_access_key,
         secret_access_key: SiteSetting.subscription_server_iam_secret_access_key
       }
@@ -207,6 +208,7 @@ module SubscriptionServer
     def check_missing_options
       raise SettingMissing.new("iam_access_key_id") if SiteSetting.subscription_server_iam_access_key.blank?
       raise SettingMissing.new("iam_secret_access_key") if SiteSetting.subscription_server_iam_secret_access_key.blank?
+      raise SettingMissing.new("iam_region") if SiteSetting.subscription_server_iam_region.blank?
     end
   end
 end

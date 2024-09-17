@@ -8,3 +8,4 @@ plugins:
     default: ''
   subscription_server_iam_access_key: ''
   subscription_server_iam_secret_access_key: ''
+  subscription_server_iam_region: 'us-east-1'
