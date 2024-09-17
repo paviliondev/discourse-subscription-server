@@ -13,6 +13,15 @@ module SubscriptionServer
     def create_user(user_name: nil, group_name: nil)
       return unless user_name && group_name
 
+      iam_list_users.each do |user|
+        if user.user_name == user_name
+          suffix_count = 1
+          suffix_match = user_name.match(/_\d+$/)
+          suffix_count = suffix_match[0].split("_")[-1].to_i + 1 if suffix_match
+          user_name = "#{user_name}_#{suffix_count.to_s}"
+        end
+      end
+
       user_response = iam_create_user(user_name: user_name)
       return false unless user_response
 
@@ -90,6 +99,16 @@ module SubscriptionServer
     end
 
     protected
+
+    def iam_list_users
+      users = []
+      iam_client.list_users.each_page do |page|
+        page.users.each do |user|
+          users << user
+        end
+      end
+      users
+    end
 
     def iam_create_user(user_name: nil, group_name: nil)
       response = iam_client.create_user(user_name: user_name)
