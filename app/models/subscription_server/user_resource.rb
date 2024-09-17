@@ -88,3 +88,23 @@ module SubscriptionServer
     end
   end
 end
+
+# == Schema Information
+#
+# Table name: subscription_server_user_resources
+#
+#  id                    :bigint           not null, primary key
+#  user_id               :bigint           not null
+#  resource_name         :string           not null
+#  iam_user_name         :string
+#  iam_access_key_id     :string
+#  iam_secret_access_key :string
+#  iam_key_updated_at    :string
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#
+# Indexes
+#
+#  idx_subscription_server_user_resources               (user_id,resource_name) UNIQUE
+#  index_subscription_server_user_resources_on_user_id  (user_id)
+#
