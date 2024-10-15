@@ -30,7 +30,7 @@ class SubscriptionServer::Stripe < SubscriptionServer::Provider
       sub_hash = sub.to_h
       price = sub_hash[:items][:data][0][:price]
 
-      if product_ids.include?(price[:product]) && sub_hash[:canceled_at].blank?
+      if product_ids.include?(price[:product]) && sub_hash[:status] == 'active'
         product = ::Stripe::Product.retrieve(price[:product])
         subscription = SubscriptionServer::Subscription.new(
           resource: resource_name,
