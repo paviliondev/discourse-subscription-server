@@ -5,17 +5,17 @@ module SubscriptionServer
 
     belongs_to :user
 
-    def ready?
+    def iam_ready?
       iam_user_name.present? && iam_access_key_id.present? && iam_secret_access_key.present?
     end
 
-    def create_iam_user(resource_name)
+    def create_iam_user(iam)
       key = aws.create_user(
         user_name: self.user.username,
-        group_name: self.class.resource_groups[resource_name]
+        group_name: iam[:group]
       )
       if key
-        self.update(
+        result = self.update(
           iam_user_name: key[:user_name],
           iam_access_key_id: key[:access_key_id],
           iam_secret_access_key: key[:secret_access_key],
@@ -47,41 +47,32 @@ module SubscriptionServer
       @aws ||= SubscriptionServer::AWS.new
     end
 
-    def self.resource_groups
-      @resource_groups ||= {
-        'discourse-events': 'discourse_events'
-      }.as_json
-    end
-
-    def self.resource_supported?(resource_name)
-      resource_groups[resource_name].present?
-    end
-
     def self.list(user_id, subscriptions)
       result = []
 
       subscriptions.each do |subscription|
         resource_name = subscription.resource
-        next unless resource_supported?(resource_name)
+        resource = SubscriptionServer::Subscription.subscription_map[resource_name]
+        next unless resource.present?
 
         user_resource = self.find_or_create_by(
           user_id: user_id,
           resource_name: resource_name
         )
 
-        if !user_resource.iam_user_name
-          user_resource.create_iam_user(resource_name)
-        elsif !user_resource.iam_access_key_id
-          user_resource.rotate_iam_key
+        if resource[:iam]
+          if !user_resource.iam_user_name
+            user_resource.create_iam_user(resource[:iam])
+          elsif !user_resource.iam_access_key_id
+            user_resource.rotate_iam_key
+          end
+          if user_resource.iam_key_updated_at > 1.week.ago
+            user_resource.rotate_iam_key
+          end
+          next unless user_resource.iam_ready?
         end
 
-        if user_resource.iam_key_updated_at > 1.week.ago
-          user_resource.rotate_iam_key
-        end
-
-        if user_resource.ready?
-          result << user_resource
-        end
+        result << user_resource.reload
       end
 
       result
