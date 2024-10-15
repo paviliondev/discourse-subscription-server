@@ -27,6 +27,7 @@ class SubscriptionServer::Subscription
           provider = parts[2]
           product_id = parts[3]
           domain_limit = parts[4]
+          iam_group = parts[5]
 
           result[resource] ||= { provider: provider, products: [] }
           result[resource][:products] << {
@@ -38,6 +39,8 @@ class SubscriptionServer::Subscription
             result[resource][:domain_limits] ||= []
             result[resource][:domain_limits] << { product_id: product_id, domain_limit: domain_limit.to_i }
           end
+
+          result[resource][:iam] = { group: iam_group } if iam_group
         end
 
         result

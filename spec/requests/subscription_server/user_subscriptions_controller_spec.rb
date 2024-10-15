@@ -5,7 +5,7 @@ describe SubscriptionServer::UserSubscriptionsController do
   let(:subscription_user_api_key) { Fabricate(:subscription_server_user_api_key, user: user) }
   let(:readonly_user_api_key) { Fabricate(:readonly_user_api_key, user: user) }
   let(:provider) { "stripe" }
-  let(:resource) { "custom_wizard" }
+  let(:resource_name) { "custom_wizard" }
   let(:client) { "https://demo.pavilion.tech" }
 
   it "requires a user authenticated with a user api key" do
@@ -28,15 +28,15 @@ describe SubscriptionServer::UserSubscriptionsController do
     end
 
     describe "#index" do
-      before do
-        @subscription = SubscriptionServer::Subscription.new(
-          resource: resource,
+      let!(:subscription) {
+        SubscriptionServer::Subscription.new(
+          resource: resource_name,
           product_id: "prod_CBTNpi3fqWWkq0",
           product_name: "Business Subscription",
           price_id: "price_id",
           price_name: "yearly"
         )
-      end
+      }
 
       it "requires a request origin" do
         get "/subscription-server/user-subscriptions", headers: headers.except(:ORIGIN)
@@ -44,26 +44,66 @@ describe SubscriptionServer::UserSubscriptionsController do
       end
 
       it "returns subscription list if SubscriptionServer::UserSubscriptions loads subcriptions" do
-        SubscriptionServer::UserSubscriptions.any_instance.stubs(:subscriptions).returns([@subscription])
-        get "/subscription-server/user-subscriptions", headers: headers, params: { resources: [resource] }
+        SubscriptionServer::UserSubscriptions.any_instance.stubs(:subscriptions).returns([subscription])
+        get "/subscription-server/user-subscriptions", headers: headers, params: { resources: [resource_name] }
         expect(response.status).to eq(200)
         expect(response.parsed_body).to eq(
           {
             success: "OK",
-            subscriptions: ActiveModel::ArraySerializer.new([@subscription], each_serializer: SubscriptionServer::SubscriptionSerializer).as_json
+            subscriptions: ActiveModel::ArraySerializer.new(
+              [subscription],
+              each_serializer: SubscriptionServer::UserSubscriptionSerializer
+            ).as_json,
+            resources: []
           }.as_json
         )
       end
 
       it "returns a blank array if SubscriptionServer::UserSubscriptions does not load any subscriptions" do
-        get "/subscription-server/user-subscriptions", headers: headers, params: { resources: [resource] }
+        get "/subscription-server/user-subscriptions", headers: headers, params: { resources: [resource_name] }
         expect(response.status).to eq(200)
         expect(response.parsed_body).to eq(
           {
             success: "OK",
-            subscriptions: [].as_json
+            subscriptions: [].as_json,
+            resources: []
           }.as_json
         )
+      end
+
+      context "with subscription resources" do
+        let!(:resource) {
+          SubscriptionServer::UserResource.new(
+            resource_name: resource_name,
+            iam_user_name: user.username,
+            iam_access_key_id: '12345',
+            iam_secret_access_key: '23rn2o3irn2',
+            iam_key_updated_at: Time.now
+          )
+        }
+
+        before do
+          SubscriptionServer::UserSubscriptions.stubs(:load).returns([subscription])
+          SubscriptionServer::UserResource.stubs(:list).returns([resource])
+        end
+
+        it "returns valid resources" do
+          get "/subscription-server/user-subscriptions", headers: headers, params: { resources: [resource_name] }
+          expect(response.status).to eq(200)
+          expect(response.parsed_body).to eq(
+            {
+              success: "OK",
+              subscriptions: ActiveModel::ArraySerializer.new(
+                [subscription],
+                each_serializer: SubscriptionServer::UserSubscriptionSerializer
+              ).as_json,
+              resources: ActiveModel::ArraySerializer.new(
+                [resource],
+                each_serializer: SubscriptionServer::UserResourceSerializer
+              ).as_json
+            }.as_json
+          )
+        end
       end
     end
   end
