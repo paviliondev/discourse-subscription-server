@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 describe UserApiKeysController do
-  fab!(:user) { Fabricate(:user) }
+  fab!(:user) { Fabricate(:user, trust_level: TrustLevel[1]) }
 
   let :public_key do
     <<~TXT

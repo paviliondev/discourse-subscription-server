@@ -7,6 +7,8 @@
 # authors: Angus McLeod
 # contact_emails: development@pavilion.tech
 
+gem "aws-sdk-iam", "1.96.0"
+
 enabled_site_setting :subscription_server_enabled
 
 DiscourseEvent.on(:after_plugin_activation) do
@@ -26,13 +28,17 @@ after_initialize do
     ../lib/subscription_server/user_subscriptions.rb
     ../lib/subscription_server/extensions/user_api_key.rb
     ../lib/subscription_server/extensions/user_api_keys_controller.rb
+    ../lib/subscription_server/aws.rb
     ../config/routes.rb
+    ../app/models/subscription_server/user_resource.rb
     ../app/controllers/subscription_server/user_subscriptions_controller.rb
     ../app/controllers/subscription_server/user_authorizations_controller.rb
     ../app/controllers/subscription_server/messages_controller.rb
     ../app/controllers/subscription_server/server_controller.rb
     ../app/serializers/subscription_server/message_serializer.rb
-    ../app/serializers/subscription_server/subscription_serializer.rb
+    ../app/serializers/subscription_server/user_subscription_serializer.rb
+    ../app/serializers/subscription_server/user_resource_serializer.rb
+    ../app/jobs/scheduled/subscription_server/expire_stale_keys.rb
   ].each do |path|
     load File.expand_path(path, __FILE__)
   end

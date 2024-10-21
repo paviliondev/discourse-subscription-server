@@ -15,10 +15,27 @@ class SubscriptionServer::UserSubscriptionsController < ApplicationController
       raise Discourse::InvalidParameters.new('user subscriptions require a valid request origin')
     end
 
-    user_subs = SubscriptionServer::UserSubscriptions.new(current_user, domain)
-    user_subs.load(resources)
+    user_subscriptions = SubscriptionServer::UserSubscriptions.load(
+      current_user,
+      domain,
+      resources
+    )
 
-    render json: success_json.merge(subscriptions: serialize_data(user_subs.subscriptions, SubscriptionServer::SubscriptionSerializer))
+    user_resources = SubscriptionServer::UserResource.list(
+      current_user.id,
+      user_subscriptions
+    )
+
+    render json: success_json.merge(
+      subscriptions: serialize_data(
+        user_subscriptions,
+        SubscriptionServer::UserSubscriptionSerializer
+      ),
+      resources: serialize_data(
+        user_resources,
+        SubscriptionServer::UserResourceSerializer
+      )
+    )
   end
 
   protected

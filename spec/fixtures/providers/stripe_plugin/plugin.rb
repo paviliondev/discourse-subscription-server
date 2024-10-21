@@ -16,6 +16,7 @@ module ::Stripe
 
   class Customer
     cattr_accessor :has_subscription
+    cattr_accessor(:subscription_attrs) { {} }
 
     def self.list(email: nil, expand: nil)
       stripe_path = "#{Rails.root}/plugins/discourse-subscription-server/spec/fixtures/providers/stripe"
@@ -29,6 +30,11 @@ module ::Stripe
         subscription["items"]["data"][0]["price"]["product"] = PRODUCT_ID
         subscription["items"]["data"][0]["price"]["id"] = PRICE_ID
         subscription["items"]["data"][0]["price"]["nickname"] = PRICE_NAME
+        if subscription_attrs.present?
+          subscription_attrs.each do |k, v|
+            subscription[k] = v
+          end
+        end
         customer_list["data"][0]["subscriptions"]["data"] << subscription
       end
 

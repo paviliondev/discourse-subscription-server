@@ -81,6 +81,16 @@ describe SubscriptionServer::UserSubscriptions do
           expect(subscription.price_name).to eq(Stripe::PRICE_NAME)
         end
 
+        context "with a cancelled subscription" do
+          it "does not load cancelled subscriptions" do
+            Stripe::Customer.has_subscription = true
+            Stripe::Customer.subscription_attrs = { "status" => "canceled" }
+            @instance.load(resources)
+            expect(@instance.errors).to include(response_error("no subscriptions found for #{resource}"))
+            expect(@instance.subscriptions).to eq([])
+          end
+        end
+
         context "with domain limit" do
           before do
             Stripe::Customer.has_subscription = true

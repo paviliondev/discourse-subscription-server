@@ -2,7 +2,10 @@ en:
   site_settings:
     subscription_server_enabled: Enable subscription server
     subscription_server_supplier_name: Supplier name, e.g. "Pavilion"
-    subscription_server_subscriptions: "List of supported subscriptions. resource:product_slug:provider:product_id:domain_limit e.g. discourse-custom-wizard:business:stripe:prod_Jyy6B9gyTJUURi:1"
+    subscription_server_subscriptions: "List of supported subscriptions. resource:product:provider:product_id:domain_limit:iam_group e.g. discourse-custom-wizard:business:stripe:prod_Jyy6B9gyTJUURi:1:custom_wizard"
+    subscription_server_iam_access_key: IAM Administrator Access Key
+    subscription_server_iam_secret_access_key: IAM Administrator Secret Access Key
+    subscription_server_iam_region: IAM region
 
   user_api_key:
     scopes:
