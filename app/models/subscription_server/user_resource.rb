@@ -66,7 +66,7 @@ module SubscriptionServer
           elsif !user_resource.iam_access_key_id
             user_resource.rotate_iam_key
           end
-          if user_resource.iam_key_updated_at > 1.week.ago
+          if user_resource.iam_key_updated_at < 1.week.ago
             user_resource.rotate_iam_key
           end
           next unless user_resource.iam_ready?
