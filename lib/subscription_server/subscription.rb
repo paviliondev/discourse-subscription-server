@@ -37,10 +37,16 @@ class SubscriptionServer::Subscription
 
           if domain_limit
             result[resource][:domain_limits] ||= []
-            result[resource][:domain_limits] << { product_id: product_id, domain_limit: domain_limit.to_i }
+            result[resource][:domain_limits] << {
+              product_id: product_id,
+              domain_limit: domain_limit.to_i
+            }
           end
 
-          result[resource][:iam] = { group: iam_group } if iam_group
+          if iam_group
+            result[resource][:iam] ||= {}
+            result[resource][:iam][product_id] = iam_group
+          end
         end
 
         result

@@ -9,14 +9,16 @@ module SubscriptionServer
       iam_user_name.present? && iam_access_key_id.present? && iam_secret_access_key.present?
     end
 
-    def create_iam_user(iam)
+    def create_iam_user(iam_group)
       key = aws.create_user(
         user_name: self.user.username,
-        group_name: iam[:group]
+        group_name: iam_group
       )
+
       if key
         result = self.update(
           iam_user_name: key[:user_name],
+          iam_group: iam_group,
           iam_access_key_id: key[:access_key_id],
           iam_secret_access_key: key[:secret_access_key],
           iam_key_updated_at: Time.now
@@ -60,15 +62,19 @@ module SubscriptionServer
           resource_name: resource_name
         )
 
-        if resource[:iam]
+        if resource[:iam].present? && resource[:iam][subscription.product_id].present?
+          iam_group = resource[:iam][subscription.product_id]
+
           if !user_resource.iam_user_name
-            user_resource.create_iam_user(resource[:iam])
+            user_resource.create_iam_user(iam_group)
           elsif !user_resource.iam_access_key_id
             user_resource.rotate_iam_key
           end
+
           if user_resource.iam_key_updated_at < 1.week.ago
             user_resource.rotate_iam_key
           end
+
           next unless user_resource.iam_ready?
         end
 

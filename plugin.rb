@@ -26,7 +26,7 @@ after_initialize do
     ../lib/subscription_server/message.rb
     ../lib/subscription_server/providers/stripe.rb
     ../lib/subscription_server/user_subscriptions.rb
-    ../lib/subscription_server/extensions/user_api_key.rb
+    ../lib/subscription_server/extensions/user_api_key_client.rb
     ../lib/subscription_server/extensions/user_api_keys_controller.rb
     ../lib/subscription_server/aws.rb
     ../config/routes.rb
@@ -43,7 +43,7 @@ after_initialize do
     load File.expand_path(path, __FILE__)
   end
 
-  UserApiKey.singleton_class.prepend SubscriptionServer::Extensions::UserApiKey
+  UserApiKeyClient.singleton_class.prepend SubscriptionServer::Extensions::UserApiKeyClient
   UserApiKeysController.prepend SubscriptionServer::Extensions::UserApiKeysController
 
   add_user_api_key_scope(:user_subscription,
